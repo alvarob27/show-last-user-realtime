@@ -3,12 +3,13 @@
 
 import { Hono } from "https://deno.land/x/hono@v3.11.8/mod.ts";
 // Importamos serveStatic para servir el index.html
-import { serveStatic } from "https://deno.land/x/hono@v3.11.8/middleware.ts";
+import { cors, serveStatic } from "https://deno.land/x/hono@v3.11.8/middleware.ts";
 // Importamos streamSSE para crear el stream de datos
 import { streamSSE } from "https://deno.land/x/hono@v3.11.8/helper/streaming/index.ts";
 
 // Creamos la aplicación con Hono
 const app = new Hono();
+app.use(cors());
 //Abrimos conexión con la base de datos
 const db = await Deno.openKv();
 // Creamos un contador
