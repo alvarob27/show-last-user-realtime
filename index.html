@@ -1,0 +1,62 @@
+<small id="content"></small>
+
+<style>
+    body{
+        background: black;
+        display: grid;
+        place-content: center;
+        min-height: 100vh;
+    }
+    small{
+        text-align: center;
+        font-size: 32px;
+        font-family: Menlo, monospace;
+        color: aliceblue;
+        padding: 25px;
+    }
+</style>
+
+
+<script type="module">
+    import CanvasConfetti from 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/+esm';
+    // Lanzamos los confettis
+    CanvasConfetti()
+
+    // Hacemos un fetch a un servicio de geolocalización 
+    const res = await fetch('https://geolocation.microlink.io/');
+    const json = await res.json();
+    // Desestructuramos el objeto json para obtener los datos que nos interesan
+    const {
+        city: {
+            name: city
+        },
+        country: {
+            name: country,
+            flag
+        }
+    } = json;
+
+    // Hacemos un fetch a nuestro servidor para guardar los datos
+    await fetch('/visit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            city,
+            country,
+            flag
+        })
+    });
+
+    console.log(city, country, flag);
+    // Nos suscribimos al evento update que hemos creado en el servidor
+    const source = new EventSource('/visit');
+    // Recuperamos la lista
+    const small = document.querySelector('#content');
+    // Cada vez que recibamos un evento, lo mostramos en la lista
+    source.addEventListener('update', (event) => {
+        const { city, country, flag } = JSON.parse(event.data);
+        small.textContent = `Last visit from ${city}, ${country} ${flag}`;
+    })
+</script>
