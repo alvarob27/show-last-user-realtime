@@ -20,6 +20,7 @@ let i = 0;
 // Creamos una ruta para servir el index.html
 app.get("/", serveStatic({ path: "./index.html" }));
 
+// Creamos una interfaz para la última visita
 interface LastVisit {
   city: string;
   country: string;
@@ -28,7 +29,9 @@ interface LastVisit {
 
 // Creamos una ruta para añadir una visita a la base de datos
 app.post("/visit", async (c) => {
+  //  Recuperamos la ciudad, el país y la bandera de la petición
   const { city, country, flag } = await c.req.json<LastVisit>();
+  // Añadimos la visita a la base de datos
   await db.atomic()
     .set(["lastVisit"], {
       city,
